@@ -20,10 +20,10 @@ private:
 	struct st_BLOCK_TOP_NODE {
 		__declspec(align(16))
 		st_BLOCK_NODE* pTopNode;
-		LONG64 lCheckSum;
+		LONG64 lCounter;
 		st_BLOCK_TOP_NODE() {
 			pTopNode = NULL;
-			lCheckSum = 0;
+			lCounter = 0;
 		}
 	};
 
@@ -46,12 +46,12 @@ public:
 
 				if (i == 0) {
 					_pFreeNode->pTopNode = temp;
-					_pFreeNode->lCheckSum++;
+					_pFreeNode->lCounter++;
 				}
 				else {
 					temp->stpNextBlock = _pFreeNode->pTopNode;
 					_pFreeNode->pTopNode = temp;
-					_pFreeNode->lCheckSum++;
+					_pFreeNode->lCounter++;
 				}
 			}
 		}
@@ -63,12 +63,12 @@ public:
 
 				if (i == 0) {
 					_pFreeNode->pTopNode = temp;
-					_pFreeNode->lCheckSum++;
+					_pFreeNode->lCounter++;
 				}
 				else {
 					temp->stpNextBlock = _pFreeNode->pTopNode;
 					_pFreeNode->pTopNode = temp;
-					_pFreeNode->lCheckSum++;
+					_pFreeNode->lCounter++;
 				}
 			}
 		}
@@ -111,7 +111,7 @@ public:
 				return tempDATA;
 			}
 			pNewTop = pPopTop.pTopNode->stpNextBlock;
-			CheckSum = pPopTop.lCheckSum + 1;
+			CheckSum = pPopTop.lCounter + 1;
 
 		} while (!InterlockedCompareExchange128((LONG64*)&_pFreeNode->pTopNode, (LONG64)CheckSum, (LONG64)pNewTop, (LONG64*)&pPopTop.pTopNode));
 

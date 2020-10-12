@@ -13,7 +13,7 @@ private:
 	struct st_TOP_NODE {
 		__declspec(align(16))
 		st_NODE* pTopNode;
-		LONG64 CheckSum;
+		LONG64 lCounter;
 	};
 
 	st_TOP_NODE _pTop;
@@ -24,7 +24,7 @@ public:
 
 	CLockfreeStack() {
 		_pTop.pTopNode = NULL;
-		_pTop.CheckSum = 0;
+		_pTop.lCounter = 0;
 		_lSize = 0;
 		_Objectpool = new CObjectPool<st_NODE>(40000, false);
 	}
@@ -53,14 +53,14 @@ public:
 	void Pop(DATA* Data) {
 		st_TOP_NODE pPopTop;
 		st_NODE* pNewTop;
-		LONG64 CheckSum;
+		LONG64 lCounter;
 		do {
 			pPopTop = _pTop;
 			if (pPopTop.pTopNode == NULL)
 				return;
 			pNewTop = pPopTop.pTopNode->Next;
-			CheckSum = pPopTop.CheckSum + 1;
-		} while (!InterlockedCompareExchange128((LONG64*)&_pTop.pTopNode, (LONG64)CheckSum,(LONG64)pNewTop, (LONG64*)&pPopTop.pTopNode));
+			lCounter = pPopTop.lCounter + 1;
+		} while (!InterlockedCompareExchange128((LONG64*)&_pTop.pTopNode, (LONG64)lCounter,(LONG64)pNewTop, (LONG64*)&pPopTop.pTopNode));
 		InterlockedDecrement64(&_lSize);
 
 		*Data = pPopTop.pTopNode->_Data;
